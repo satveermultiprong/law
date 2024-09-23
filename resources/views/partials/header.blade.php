@@ -38,7 +38,7 @@
                 <div class="topbar-right">
                     <div class="topbar-right">
                         <span class="topbar-widget login" title="Lawyer Signup">
-                            <a href="{{ route('lawyer-login')}}">Lawyer Signup</a>
+                            {{-- <a href="{{ route('lawyer/login')}}">Lawyer Signup</a> --}}
                         </span>
                     </div>
                 </div>

@@ -9,7 +9,7 @@
 <body>
     @include('partials.header')
 
-    <main class="container mt-4">
+    <main class="container-fluid mt-4 ">
         @yield('content')
     </main>
 

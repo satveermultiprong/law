@@ -10,76 +10,76 @@ use Illuminate\Contracts\View\View;
 
 class LawyerController extends Controller
 {
-    public function register(Request $request)
-    {
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:lawyers,email',
-            'phone' => 'required|string|max:15',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        // Create a new lawyer record
-        Lawyer::create([
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            
-        ]);
-
-        return redirect()->back()->with('success', 'Registration successful, awaiting verification.');
-    }
+    // Show profile of authenticated lawyer
     public function showProfile(): View
     {
-        $lawyer = auth()->guard('lawyer')->user(); // Get the authenticated lawyer
+        $lawyer = auth()->guard('lawyer')->user();
         return view('lawyers.profile', compact('lawyer'));
     }
 
-    
+    // Update lawyer profile
     public function updateProfile(Request $request)
-{
-    // Fetch the authenticated lawyer
-    $lawyer = auth()->guard('lawyer')->user();
+    {
+        $lawyer = auth()->guard('lawyer')->user();
 
-    if ($lawyer instanceof \App\Models\Lawyer) {
-        // Validate the request data
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:lawyers,email,' . $lawyer->id, // Exclude current email from unique check
-            'phone' => 'required|string|max:15',
-            'license_number' => 'required|string|max:255',
-            'specialization' => 'required|string|max:255',
-            'verification_document' => 'file|mimes:pdf,jpg,png|max:2048',
-        ]);
+        if ($lawyer instanceof \App\Models\Lawyer) {
+            $request->validate([
+                'full_name' => 'required|string|max:255',
+                'email' => 'required|email|unique:lawyers,email,' . $lawyer->id,
+                'phone' => 'required|string|max:15',
+                'license_number' => 'nullable|string|max:255',
+                'gender' => 'required|string|in:male,female,other',
+                'address' => 'nullable|string|max:255',
+                'city' => 'nullable|string|max:255',
+                'state' => 'nullable|string|max:255',
+                'country' => 'nullable|string|max:255',
+                'pin_code' => 'nullable|string|max:10',
+                'alternate_mobile' => 'nullable|string|max:15|unique:lawyers,alternate_mobile,' . $lawyer->id,
+                'specialization_id' => 'required|exists:specializations,id',
+                'court_type_id' => 'required|exists:court_types,id',
+                'profile_image' => 'nullable|image|max:2048',
+                'verification_document' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
+            ]);
 
-        // Update lawyer profile fields
-        $lawyer->full_name = $request->full_name;
-        $lawyer->email = $request->email;
-        $lawyer->phone = $request->phone;
-        $lawyer->license_number = $request->license_number;
-        $lawyer->specialization = $request->specialization;
+            // Update lawyer profile fields
+            $lawyer->full_name = $request->full_name;
+            $lawyer->email = $request->email;
+            $lawyer->phone = $request->phone;
+            $lawyer->license_number = $request->license_number;
+            $lawyer->gender = $request->gender;
+            $lawyer->address = $request->address;
+            $lawyer->city = $request->city;
+            $lawyer->state = $request->state;
+            $lawyer->country = $request->country;
+            $lawyer->pin_code = $request->pin_code;
+            $lawyer->alternate_mobile = $request->alternate_mobile;
+            $lawyer->specialization_id = $request->specialization_id;
+            $lawyer->court_type_id = $request->court_type_id;
 
-        // Upload verification document if provided
-        if ($request->hasFile('verification_document')) {
-            // Optional: Delete old file
-            if ($lawyer->verification_document) {
-                Storage::disk('public')->delete($lawyer->verification_document);
+            // Handle profile image upload
+            if ($request->hasFile('profile_image')) {
+                if ($lawyer->profile_image) {
+                    Storage::disk('public')->delete($lawyer->profile_image);
+                }
+                $path = $request->file('profile_image')->store('public/profile_images');
+                $lawyer->profile_image = basename($path);
             }
 
-            $documentPath = $request->file('verification_document')->store('documents', 'public');
-            $lawyer->verification_document = $documentPath;
+            // Handle document upload if provided
+            if ($request->hasFile('verification_document')) {
+                if ($lawyer->verification_document) {
+                    Storage::disk('public')->delete($lawyer->verification_document);
+                }
+                $documentPath = $request->file('verification_document')->store('documents', 'public');
+                $lawyer->verification_document = $documentPath;
+            }
+
+            // Save updates
+            $lawyer->save();
+
+            return redirect()->back()->with('success', 'Profile updated successfully!');
+        } else {
+            return back()->withErrors('Lawyer not found or unauthorized.');
         }
-
-        // Save updated lawyer profile
-        $lawyer->save();
-
-        // Redirect back with success message
-        return redirect()->back()->with('success', 'Profile updated successfully!');
-    } else {
-        return back()->withErrors('Lawyer not found or unauthorized.');
     }
-}
-
-
 }

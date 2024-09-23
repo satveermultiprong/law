@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Step Registration</title>
+    <title>Lawyer Registration</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .step { display: none; }
@@ -67,7 +67,6 @@
         $(document).ready(function() {
             var currentStep = 1;
 
-            // Show next step
             function showStep(step) {
                 $('.step').removeClass('active');
                 $('#step' + step).addClass('active');
@@ -79,7 +78,6 @@
                 var email = $('#email').val();
                 var mobile = $('#mobile').val();
 
-                // Ajax request to send OTP
                 $.ajax({
                     url: '{{ route("lawyer.sendOtp") }}',
                     method: 'POST',
@@ -105,7 +103,6 @@
             $('.verifyOtpBtn').click(function() {
                 var otp = $('#otp').val();
 
-                // Ajax request to verify OTP
                 $.ajax({
                     url: '{{ route("lawyer.verifyOtp") }}',
                     method: 'POST',
@@ -127,35 +124,44 @@
 
             // Step 3: Register the user
             $('#registrationForm').submit(function(e) {
-                e.preventDefault();
+    e.preventDefault();
 
-                var password = $('#password').val();
-                var password_confirmation = $('#password_confirmation').val();
+    var password = $('#password').val();
+    var password_confirmation = $('#password_confirmation').val();
 
-                if (password !== password_confirmation) {
-                    alert('Passwords do not match.');
-                    return;
-                }
+    if (password !== password_confirmation) {
+        alert('Passwords do not match.');
+        return;
+    }
 
-                // Ajax request to register the user
-                $.ajax({
-                    url: '{{ route("lawyer.register") }}',
-                    method: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        password: password,
-                        password_confirmation: password_confirmation
-                    },
-                    success: function(response) {
-                        if(response.success) {
-                            alert('Registration successful! Please log in.');
-                            window.location.href = '{{ route("lawyer.login") }}';
-                        } else {
-                            alert('Something went wrong.');
-                        }
-                    }
-                });
-            });
+    // Ajax request to register the user
+    $.ajax({
+        url: '{{ route("lawyer.register") }}',
+        method: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            full_name: $('#name').val(),
+            email: $('#email').val(),
+            mobile: $('#mobile').val(),
+            password: password,
+            password_confirmation: password_confirmation
+        },
+        success: function(response) {
+            if(response.success) {
+                alert('Registration successful! Please log in.');
+                window.location.href = '{{ route("lawyer.login") }}';
+            } else {
+                alert('Something went wrong: ' + response.error);
+            }
+        },
+        error: function(xhr) {
+            // Handle error response
+            var response = xhr.responseJSON;
+            alert('Error: ' + (response.error || 'Something went wrong.'));
+        }
+    });
+});
+
         });
     </script>
 </body>

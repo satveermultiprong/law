@@ -1,21 +1,36 @@
 <!-- resources/views/lawyer/login.blade.php -->
 
-@extends('layouts.app')
-
-@section('content')
-<div class="container">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lawyer Login</title>
+</head>
+<body>
     <h2>Lawyer Login</h2>
-    <form method="POST" action="{{ route('lawyer.login') }}">
+
+    @if ($errors->any())
+        <div>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('lawyer.login.submit') }}" method="POST">
         @csrf
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" class="form-control" required>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" name="email" required>
         </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-primary">Login</button>
+        <div>
+            <button type="submit">Login</button>
+        </div>
     </form>
-</div>
-@endsection
+</body>
+</html>
