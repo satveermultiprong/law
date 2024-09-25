@@ -1,5 +1,6 @@
-@include('layout.header');
 
+@extends('layouts.app');
+@section('content')
 <div class="no-bottom no-top" id="content">
     <div id="top"></div>
     <section class="search-section">
@@ -59,7 +60,7 @@
                                 <p>Family Law</p>
                                 <p>10+ Years Experience</p>
                                 <p>New York, NY</p>
-                                <a href="{{ route('lawyer-profile')}}" class="btn-custom">View Profile</a>
+                                {{-- <a href="{{ route('lawyer-profile')}}" class="btn-custom">View Profile</a> --}}
                             </div>
                         </div>
                     </div>
@@ -74,7 +75,7 @@
                                 <p>Criminal Law</p>
                                 <p>5+ Years Experience</p>
                                 <p>Los Angeles, CA</p>
-                                <a href="{{ route('lawyer-profile')}}" class="btn-custom">View Profile</a>
+                                {{-- <a href="{{ route('lawyer-profile')}}" class="btn-custom">View Profile</a> --}}
                             </div>
                         </div>
                     </div>
@@ -86,5 +87,4 @@
     
 </div>
 
-
-@include('layout.footer')
+@endsection

@@ -1,4 +1,4 @@
-@include('layout.header');
+@extends('layout.app');
 <div class="no-bottom no-top" id="content">
     <div id="top"></div>
     <section class="profile-section">
@@ -62,4 +62,3 @@
         </div>
     </section>
 </div>
-@include('layout.footer')

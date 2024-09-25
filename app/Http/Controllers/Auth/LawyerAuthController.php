@@ -1,12 +1,12 @@
 <?php
 
-// app/Http/Controllers/Auth/LawyerAuthController.php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Lawyer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class LawyerAuthController extends Controller
 {
@@ -19,13 +19,22 @@ class LawyerAuthController extends Controller
     // Handle the login request
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
 
-        if (Auth::guard('lawyer')->attempt($credentials)) {
-            return redirect()->route('lawyer.dashboard');
+        $lawyer = Lawyer::where('email', $request->email)->first();
+
+        if ($lawyer && Hash::check($request->password, $lawyer->password)) {
+            Auth::login($lawyer);
+            return redirect()->intended('lawyer-dashboard'); // Success
         }
-
-        return back()->withErrors(['email' => 'Invalid credentials.']);
+        // dd($credentials);
+        $Lawyer = Lawyer::where('email', $lawyer['email'])->first();
+        if ($Lawyer) {
+            // Password mismatch case
+            return back()->withErrors(['password' => 'The provided password is incorrect.']);
+        } else {
+            // User not found case
+            return back()->withErrors(['email' => 'No Lawyer found with this email address.']);
+        }
     }
 
     // Handle the logout request
